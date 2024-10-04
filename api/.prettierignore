@@ -1,0 +1,6 @@
+.git
+node_modules
+public/*
+.prettierrc
+nodemon.json
+tsconfig.json
