@@ -16,6 +16,27 @@ export interface User {
   token: string;
 }
 
+export interface OnlineUser {
+  _id: string;
+  displayName: string;
+}
+
+export interface IncomingLogin {
+  type: 'LOGIN-SUCCESSFUL';
+  payload: {
+    onlineUsers: OnlineUser[];
+  };
+}
+
+export interface IncomingNewUser {
+  type: 'NEW-USER';
+  payload: {
+    user: OnlineUser;
+  };
+}
+
+export type DecodedMessage = IncomingLogin | IncomingNewUser;
+
 export interface ValidationError {
   errors: {
     [key: string]: {
