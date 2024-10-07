@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.ts",
+    "seed": "ts-node fixtures.ts",
     "format:check": "prettier --check .",
     "format": "prettier --write ."
   },
