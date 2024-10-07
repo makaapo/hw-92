@@ -1,17 +1,8 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import User from '../models/User';
+import mongoose from 'mongoose';
 
 const usersRouter = express.Router();
-
-usersRouter.get('/', async (_req, res, next) => {
-  try {
-    const users = await User.find();
-    return res.send(users);
-  } catch (e) {
-    next(e);
-  }
-});
 
 usersRouter.post('/', async (req, res, next) => {
   try {
@@ -26,22 +17,20 @@ usersRouter.post('/', async (req, res, next) => {
 
     user.generateToken();
     await user.save();
-
-    return res.send({ user });
-  } catch (e) {
-    if (e instanceof mongoose.Error.ValidationError) {
-      return res.status(400).send(e);
+    return res.send(user);
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).send(error);
     }
-
-    next(e);
+    next(error);
   }
 });
-
 usersRouter.post('/sessions', async (req, res, next) => {
   try {
     if (!req.body.username || !req.body.password) {
       return res.status(400).send({ error: 'Username and password are required!' });
     }
+
     const user = await User.findOne({ username: req.body.username });
 
     if (!user) {
@@ -57,7 +46,7 @@ usersRouter.post('/sessions', async (req, res, next) => {
     user.generateToken();
     await user.save();
 
-    return res.send({ user });
+    return res.send(user);
   } catch (e) {
     next(e);
   }
