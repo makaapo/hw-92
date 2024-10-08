@@ -21,8 +21,23 @@ export interface OnlineUser {
   displayName: string;
 }
 
+export interface Message {
+  _id: string;
+  user: OnlineUser;
+  message: string;
+  createdAt: string;
+}
+
 export interface IncomingLogin {
   type: 'LOGIN-SUCCESSFUL';
+  payload: {
+    onlineUsers: OnlineUser[];
+    messages: Message[];
+  };
+}
+
+export interface IncomingLogout {
+  type: 'USER-OFFLINE';
   payload: {
     onlineUsers: OnlineUser[];
   };
@@ -35,7 +50,14 @@ export interface IncomingNewUser {
   };
 }
 
-export type DecodedMessage = IncomingLogin | IncomingNewUser;
+export interface IncomingNewMessage {
+  type: 'NEW-MESSAGE';
+  payload: {
+    message: Message;
+  };
+}
+
+export type DecodedMessage = IncomingLogin | IncomingLogout | IncomingNewMessage | IncomingNewUser;
 
 export interface ValidationError {
   errors: {

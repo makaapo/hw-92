@@ -69,8 +69,72 @@ router.ws('/chat', (ws, _req) => {
       );
     }
 
+    if (decodedMessage.type === 'LOGOUT') {
+      delete activeConnections[id];
+
+      const index = onlineUsers.findIndex((onlineUser) => onlineUser._id === user?._id);
+
+      if (index !== -1) {
+        onlineUsers.splice(index, 1);
+      }
+
+      Object.keys(activeConnections).forEach((key) => {
+        const connection = activeConnections[key];
+        connection.send(
+          JSON.stringify({
+            type: 'USER-OFFLINE',
+            payload: { onlineUsers },
+          }),
+        );
+      });
+    }
+
+    if (decodedMessage.type === 'SEND-MESSAGE') {
+      if (user) {
+        const newMessage = new Message({
+          user: user._id,
+          message: decodedMessage.payload,
+          createdAt: new Date(),
+        });
+
+        await newMessage.save();
+
+        Object.keys(activeConnections).forEach((key) => {
+          const connection = activeConnections[key];
+          connection.send(
+            JSON.stringify({
+              type: 'NEW-MESSAGE',
+              payload: {
+                message: {
+                  _id: newMessage._id,
+                  user: user,
+                  message: newMessage.message,
+                  createdAt: newMessage.createdAt,
+                },
+              },
+            }),
+          );
+        });
+      }
+    }
+
     ws.on('close', async () => {
       delete activeConnections[id];
+
+      const userIndex = onlineUsers.findIndex((item) => item._id === user?._id);
+      onlineUsers.splice(userIndex, 1);
+
+      Object.keys(activeConnections).forEach((key) => {
+        if (key !== id) {
+          const connection = activeConnections[key];
+          connection.send(
+            JSON.stringify({
+              type: 'USER-OFFLINE',
+              payload: { onlineUsers },
+            }),
+          );
+        }
+      });
     });
   });
 });
