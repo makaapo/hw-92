@@ -31,7 +31,7 @@ const run = async () => {
     {
       username: 'makapo',
       displayName: 'Макар',
-      password: '123',
+      password: '1234',
       token: randomUUID(),
     },
   );
